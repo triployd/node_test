@@ -1,36 +1,23 @@
-var events = require('events');
-var eventEmitter = new events.EventEmitter();
+var fs = require("fs");
+var data = '';
 
-// listener #1
-var listner1 = function listner1() {
-   console.log('listner1 executed.');
-}
+// Create a readable stream
+var readerStream = fs.createReadStream('input.txt');
 
-// listener #2
-var listner2 = function listner2() {
-  console.log('listner2 executed.');
-}
+// Set the encoding to be utf8. 
+readerStream.setEncoding('UTF8');
 
-// Bind the connection event with the listner1 function
-eventEmitter.addListener('connection', listner1);
+// Handle stream events --> data, end, and error
+readerStream.on('data', function(chunk) {
+   data += chunk;
+});
 
-// Bind the connection event with the listner2 function
-eventEmitter.on('connection', listner2);
+readerStream.on('end',function(){
+   console.log(data);
+});
 
-var eventListeners = require('events').EventEmitter.listenerCount(eventEmitter,'connection');
-console.log(eventListeners + " Listner(s) listening to connection event");
+readerStream.on('error', function(err){
+   console.log(err.stack);
+});
 
-// Fire the connection event 
-eventEmitter.emit('connection');
-
-// Remove the binding of listner1 function
-eventEmitter.removeListener('connection', listner1);
-console.log("Listner1 will not listen now.");
-
-// Fire the connection event 
-eventEmitter.emit('connection');
-
-eventListeners = require('events').EventEmitter.listenerCount(eventEmitter,'connection');
-console.log(eventListeners + " Listner(s) listening to connection event");
-
-console.log("Program Ended.");
+console.log("Program Ended");
